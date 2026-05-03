@@ -24,6 +24,7 @@ Mini-aplicación SPA para la compra de dispositivos móviles, desarrollada como 
 ```bash
 # Clonar el repositorio
 git clone 
+cd mobile-shop
 
 # Instalar dependencias
 npm install
