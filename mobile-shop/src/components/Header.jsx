@@ -1,0 +1,23 @@
+export function Header() {
+  return (
+    <header className="header">
+      <div className="shell header-inner">
+        <a href="#" className="brand">
+          <span className="brand-mark" aria-hidden="true" />
+        </a>
+        <nav className="crumbs" aria-label="Breadcrumb">
+          <span className="crumb-current">Catalog</span>
+        </nav>
+        <a href="#" className="cart" aria-label="Cart, 0 items" onClick={(e) => e.preventDefault()}>
+          <svg className="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 6h2l2.5 11.5a2 2 0 0 0 2 1.5h7a2 2 0 0 0 2-1.5L21 9H6" />
+            <circle cx="10" cy="21" r="1" />
+            <circle cx="17" cy="21" r="1" />
+          </svg>
+          <span>Cart</span>
+          <span className="cart-count is-zero">0</span>
+        </a>
+      </div>
+    </header>
+  );
+}
