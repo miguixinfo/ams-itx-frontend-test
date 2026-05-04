@@ -1,73 +1,91 @@
-# 📱 Mobile Shop — ITX Frontend Test
+# Mobile Shop — Frontend Test
 
-Mini-aplicación SPA para la compra de dispositivos móviles, desarrollada como prueba técnica para AMS/Inditex.
+A mobile-device shop SPA built as a frontend technical test. Implements a product listing page (PLP) and a product detail page (PDP) with cart functionality, consuming the provided REST API.
 
-## 🚀 Tech Stack
+## Stack
 
-- **React 18** + **React Router v6**
-- **Vite** (bundler)
-- **Vitest** + **React Testing Library** (tests)
-- **ESLint** + **Prettier** (calidad de código)
-- **CSS Modules** (estilos)
+| Layer | Technology |
+|---|---|
+| UI | React 19 |
+| Routing | React Router v7 |
+| Styling | Tailwind CSS v4 |
+| Build | Vite 8 |
+| Testing | Vitest + Testing Library |
+| Linting | ESLint + Prettier |
 
-## ⚙️ Scripts
+## Features
 
-| Script | Comando | Descripción |
-|---|---|---|
-| Desarrollo | `npm run dev` | Servidor local con HMR |
-| Build | `npm run build` | Compilación para producción |
-| Test | `npm run test` | Lanzamiento de tests |
-| Lint | `npm run lint` | Comprobación de código |
+- **PLP** — product grid with real-time search filtering by brand or model; skeleton loading state; error state
+- **PDP** — product image, full spec table, color/storage selectors, add-to-cart action
+- **Cart counter** — persisted in `localStorage`, updated on every successful add-to-cart API call
+- **API cache** — product list and individual products are cached in `localStorage` with a 1-hour TTL to avoid redundant requests
+- **Breadcrumb** — header automatically reflects current page context (Catalog vs product model name)
 
-## 🛠️ Instalación y ejecución
-
-```bash
-# Clonar el repositorio
-git clone 
-cd mobile-shop
-
-# Instalar dependencias
-npm install
-
-# Iniciar en modo desarrollo
-npm run dev
-```
-
-## 🏗️ Estructura del proyecto
+## Project structure
 
 ```
 src/
-├── components/        # Componentes reutilizables
-│   ├── Header/
-│   ├── SearchBar/
-│   └── ProductCard/
-├── pages/             # Vistas principales
-│   ├── ProductList/   # PLP
-│   └── ProductDetail/ # PDP
-├── services/          # Lógica de API + caché
-│   └── api.js
-├── hooks/             # Custom hooks
-├── context/           # Estado global (carrito)
-└── router/            # Configuración de rutas
+├── components/
+│   ├── Header.jsx          # Top nav: brand logo, breadcrumb, cart counter
+│   ├── PLP.jsx             # Product listing page
+│   ├── PDP.jsx             # Product detail page
+│   ├── ProductCard.jsx     # Single card in the grid
+│   ├── SearchBar.jsx       # Controlled search input
+│   └── SkeletonGrid.jsx    # Placeholder grid shown while loading
+├── context/
+│   └── CartContext.jsx     # Global cart count + dynamic page title
+├── hooks/
+│   ├── useProducts.js      # Fetch + cache product list
+│   └── useProductDetail.js # Fetch + cache single product (cancellable)
+├── services/
+│   └── api.js              # Fetch wrappers with localStorage cache layer
+└── test/                   # Unit tests mirroring src structure
 ```
 
-## 🌐 API
+## Getting started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+## Testing
+
+```bash
+# Run tests in watch mode
+npm test
+
+# Single run with coverage report
+npm run coverage
+```
+
+Tests use `jsdom` as environment and `@testing-library/react` for component assertions. API calls are always mocked at the module level.
+
+## Linting
+
+```bash
+npm run lint
+```
+
+ESLint is configured with `eslint-config-prettier` so formatting is handled exclusively by Prettier. The script runs with `--max-warnings 0`.
+
+## API
 
 Base URL: `https://itx-frontend-test.onrender.com`
 
-| Método | Endpoint | Descripción |
+| Method | Endpoint | Description |
 |---|---|---|
-| GET | `/api/product` | Listado de productos |
-| GET | `/api/product/:id` | Detalle de producto |
-| POST | `/api/cart` | Añadir al carrito |
+| `GET` | `/api/product` | List all products |
+| `GET` | `/api/product/:id` | Get product detail by ID |
+| `POST` | `/api/cart` | Add item to cart — body: `{ id, colorCode, storageCode }` — returns `{ count }` |
 
-## 💾 Caché
-
-Los datos del API se cachean en memoria del cliente con una expiración de **1 hora**. Pasado ese tiempo, se revalidan automáticamente.
-
-## 📝 Notas técnicas
-
-- SPA con enrutado en cliente (sin SSR ni MPA)
-- El contador del carrito persiste en `localStorage`
-- Filtrado en tiempo real por Marca y Modelo
-- Diseño responsive: máximo 4 columnas en desktop, adaptativo en móvil
+Both `GET` endpoints are cached client-side in `localStorage` for 1 hour. Stale or malformed cache entries are silently discarded.
