@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { PLP } from '../../components/PLP';
 import * as useProductsModule from '../../hooks/useProducts';
 
@@ -19,6 +20,14 @@ function mockHook(overrides = {}) {
   });
 }
 
+function renderPLP() {
+  return render(
+    <MemoryRouter>
+      <PLP />
+    </MemoryRouter>
+  );
+}
+
 describe('PLP', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -26,13 +35,13 @@ describe('PLP', () => {
 
   it('shows the skeleton grid while loading', () => {
     mockHook({ loading: true });
-    const { container } = render(<PLP />);
+    const { container } = renderPLP();
     expect(container.querySelector('.skeleton-grid')).toBeInTheDocument();
   });
 
   it('shows all products after loading', () => {
     mockHook({ loading: false, products: PRODUCTS });
-    render(<PLP />);
+    renderPLP();
     expect(screen.getByText('Aero 14 Pro')).toBeInTheDocument();
     expect(screen.getByText('Pulse X')).toBeInTheDocument();
     expect(screen.getByText('Aero 14')).toBeInTheDocument();
@@ -40,13 +49,13 @@ describe('PLP', () => {
 
   it('displays the correct total result count', () => {
     mockHook({ loading: false, products: PRODUCTS });
-    render(<PLP />);
+    renderPLP();
     expect(screen.getByText('3 RESULTS')).toBeInTheDocument();
   });
 
   it('filters products by brand in real time', async () => {
     mockHook({ loading: false, products: PRODUCTS });
-    render(<PLP />);
+    renderPLP();
 
     await userEvent.type(screen.getByRole('searchbox'), 'Korvex');
 
@@ -56,7 +65,7 @@ describe('PLP', () => {
 
   it('filters products by model in real time', async () => {
     mockHook({ loading: false, products: PRODUCTS });
-    render(<PLP />);
+    renderPLP();
 
     await userEvent.type(screen.getByRole('searchbox'), 'Pulse');
 
@@ -66,7 +75,7 @@ describe('PLP', () => {
 
   it('updates the result counter when filtering', async () => {
     mockHook({ loading: false, products: PRODUCTS });
-    render(<PLP />);
+    renderPLP();
 
     await userEvent.type(screen.getByRole('searchbox'), 'Nimbus');
 
@@ -75,7 +84,7 @@ describe('PLP', () => {
 
   it('uses singular RESULT when exactly one product matches', async () => {
     mockHook({ loading: false, products: PRODUCTS });
-    render(<PLP />);
+    renderPLP();
 
     await userEvent.type(screen.getByRole('searchbox'), 'Pulse X');
 
@@ -84,7 +93,7 @@ describe('PLP', () => {
 
   it('shows an empty state when no products match the query', async () => {
     mockHook({ loading: false, products: PRODUCTS });
-    render(<PLP />);
+    renderPLP();
 
     await userEvent.type(screen.getByRole('searchbox'), 'zzznomatch');
 
@@ -93,7 +102,7 @@ describe('PLP', () => {
 
   it('shows the error state when loading fails', () => {
     mockHook({ loading: false, error: 'API error: 500' });
-    render(<PLP />);
+    renderPLP();
     expect(screen.getByText(/failed to load products/i)).toBeInTheDocument();
     expect(screen.getByText('API error: 500')).toBeInTheDocument();
   });

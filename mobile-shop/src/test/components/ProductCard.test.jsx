@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { ProductCard } from '../../components/ProductCard';
 
 const BASE_PRODUCT = {
@@ -11,48 +11,37 @@ const BASE_PRODUCT = {
   imgUrl: 'https://example.com/phone.jpg',
 };
 
-describe('ProductCard', () => {
-  it('renders the product id, brand, model, and formatted price', () => {
-    render(<ProductCard product={BASE_PRODUCT} onClick={() => {}} />);
+function renderCard(product = BASE_PRODUCT) {
+  return render(
+    <MemoryRouter>
+      <ProductCard product={product} />
+    </MemoryRouter>
+  );
+}
 
-    expect(screen.getByText('ZG001')).toBeInTheDocument();
+describe('ProductCard', () => {
+  it('links to the product detail page', () => {
+    renderCard();
+    expect(screen.getByRole('link')).toHaveAttribute('href', `/product/${BASE_PRODUCT.id}`);
+  });
+
+  it('renders the product brand, model, and formatted price', () => {
+    renderCard();
     expect(screen.getByText('Nimbus')).toBeInTheDocument();
     expect(screen.getByText('Aero 14 Pro')).toBeInTheDocument();
     expect(screen.getByText(/949/)).toBeInTheDocument();
   });
 
   it('renders an img with the correct src when imgUrl is provided', () => {
-    render(<ProductCard product={BASE_PRODUCT} onClick={() => {}} />);
-
+    renderCard();
     const img = screen.getByRole('img');
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute('src', BASE_PRODUCT.imgUrl);
   });
 
   it('renders the phone placeholder when imgUrl is absent', () => {
-    const product = { ...BASE_PRODUCT, imgUrl: undefined };
-    const { container } = render(<ProductCard product={product} onClick={() => {}} />);
-
+    const { container } = renderCard({ ...BASE_PRODUCT, imgUrl: undefined });
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(container.querySelector('.ph')).toBeInTheDocument();
-  });
-
-  it('calls onClick when the card is clicked', async () => {
-    const onClick = vi.fn();
-    render(<ProductCard product={BASE_PRODUCT} onClick={onClick} />);
-
-    await userEvent.click(screen.getByRole('link'));
-
-    expect(onClick).toHaveBeenCalledOnce();
-  });
-
-  it('calls onClick when Enter is pressed on the card', async () => {
-    const onClick = vi.fn();
-    render(<ProductCard product={BASE_PRODUCT} onClick={onClick} />);
-
-    screen.getByRole('link').focus();
-    await userEvent.keyboard('{Enter}');
-
-    expect(onClick).toHaveBeenCalledOnce();
   });
 });
