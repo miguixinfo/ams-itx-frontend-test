@@ -54,7 +54,7 @@ export function PLP() {
         ) : (
           <div className="grid">
             {filtered.map((p) => (
-              <ProductCard key={p.id} product={p} onClick={() => { }} />
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         )}

@@ -1,11 +1,10 @@
-export function ProductCard({ product, onClick }) {
+import { Link } from 'react-router-dom';
+
+export function ProductCard({ product }) {
   return (
-    <article
+    <Link
+      to={`/product/${product.id}`}
       className="card"
-      onClick={onClick}
-      tabIndex={0}
-      role="link"
-      onKeyDown={(e) => e.key === 'Enter' && onClick()}
       aria-label={`${product.brand} ${product.model}, €${product.price}`}
     >
       <div className="card-image">
@@ -28,6 +27,6 @@ export function ProductCard({ product, onClick }) {
         </div>
       </div>
       <div className="card-cta" aria-hidden="true">View →</div>
-    </article>
+    </Link>
   );
 }
