@@ -10,7 +10,7 @@ export async function getProductById(id) {
       const { data, timestamp } = JSON.parse(raw);
       if (Date.now() - timestamp < CACHE_TTL) return data;
     }
-  } catch {}
+  } catch { /* ignore stale or malformed cache entries */ }
 
   const res = await fetch(`${BASE_URL}/api/product/${id}`);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -18,7 +18,7 @@ export async function getProductById(id) {
 
   try {
     localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
-  } catch {}
+  } catch { /* ignore stale or malformed cache entries */ }
 
   return data;
 }
@@ -40,7 +40,7 @@ export async function getProducts() {
       const { data, timestamp } = JSON.parse(raw);
       if (Date.now() - timestamp < CACHE_TTL) return data;
     }
-  } catch {}
+  } catch { /* ignore stale or malformed cache entries */ }
 
   const res = await fetch(`${BASE_URL}/api/product`);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -48,7 +48,7 @@ export async function getProducts() {
 
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-  } catch {}
+  } catch { /* ignore stale or malformed cache entries */ }
 
   return data;
 }

@@ -48,16 +48,22 @@ export function PDP() {
   const { product, loading, error } = useProductDetail(id);
   const { setCartCount, setPageTitle } = useContext(CartContext);
 
+  // User-driven overrides; empty string means "not yet chosen"
   const [colorCode, setColorCode] = useState('');
   const [storageCode, setStorageCode] = useState('');
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
 
-  useEffect(() => {
-    if (!product) return;
-    if (product.options?.colors?.length === 1) setColorCode(String(product.options.colors[0].code));
-    if (product.options?.storages?.length === 1) setStorageCode(String(product.options.storages[0].code));
-  }, [product]);
+  // Derive auto-selected value when only one option exists — no effect needed
+  const defaultColor = product?.options?.colors?.length === 1
+    ? String(product.options.colors[0].code)
+    : '';
+  const defaultStorage = product?.options?.storages?.length === 1
+    ? String(product.options.storages[0].code)
+    : '';
+
+  const effectiveColor = colorCode || defaultColor;
+  const effectiveStorage = storageCode || defaultStorage;
 
   useEffect(() => {
     if (product) setPageTitle(product.model);
@@ -65,13 +71,13 @@ export function PDP() {
   }, [product, setPageTitle]);
 
   async function handleAddToCart() {
-    if (adding || !colorCode || !storageCode) return;
+    if (adding || !effectiveColor || !effectiveStorage) return;
     setAdding(true);
     try {
       const res = await addToCart({
         id,
-        colorCode: Number(colorCode),
-        storageCode: Number(storageCode),
+        colorCode: Number(effectiveColor),
+        storageCode: Number(effectiveStorage),
       });
       setCartCount(res.count);
       setAdded(true);
@@ -101,7 +107,7 @@ export function PDP() {
     );
   }
 
-  const canAdd = colorCode !== '' && storageCode !== '';
+  const canAdd = effectiveColor !== '' && effectiveStorage !== '';
 
   return (
     <main>
@@ -141,7 +147,7 @@ export function PDP() {
                 <select
                   id="pdp-color"
                   className="pdp-select"
-                  value={colorCode}
+                  value={effectiveColor}
                   onChange={(e) => setColorCode(e.target.value)}
                 >
                   {product.options?.colors?.length !== 1 && (
@@ -158,7 +164,7 @@ export function PDP() {
                 <select
                   id="pdp-storage"
                   className="pdp-select"
-                  value={storageCode}
+                  value={effectiveStorage}
                   onChange={(e) => setStorageCode(e.target.value)}
                 >
                   {product.options?.storages?.length !== 1 && (
